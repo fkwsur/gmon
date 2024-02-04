@@ -1,6 +1,4 @@
-const { checkPrimeSync } = require("crypto");
 const http = require("http");
-const { url } = require("inspector");
 const server = http.createServer();
 
 let set_use = [];
@@ -17,7 +15,7 @@ server.on("request", async (data) => {
 
     let data_router = set_router[data.url];
     if (data_router != undefined) {
-      return data_router();
+      return data_router(data);
     }
 
     for (const rows of set_use) {
@@ -42,7 +40,7 @@ const router = async (router, func) => {
     if (onStart == false) {
       return set_router[router] = func;
     } else if (req.url == req_url + router) {
-        return func(req);
+      return func(req);
     }else return;
   } catch (error) {
     console.log(error);

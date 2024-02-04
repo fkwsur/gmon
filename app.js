@@ -1,11 +1,11 @@
 const app = require("./gmon");
 const Router = require("./routes")
 
-const aaa = () => {
-        console.log("찡니aa")
+const aaa = (req) => {
+        console.log(req.url + "찡니aa")
 }
-const bbb = () => {
-        console.log("찡니bb")
+const bbb = (req) => {
+        console.log(req.url + "찡니bb")
 }
 
 app.use("/api/v1/user", Router.userRouter)
