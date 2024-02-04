@@ -13,8 +13,13 @@ server.on("request", async (data) => {
   try {
     req = data;
 
+
     for(const route_rows of set_router){
-      if(route_rows.url == data.url && route_rows.method == data.method){
+      let data_url = data.url.split("?")
+      if(route_rows.url == data_url[0] && route_rows.method == data.method){
+        // req.query
+        req.query = data_url[1]
+        console.log(req.query)
         return route_rows.func(data);
       }
     }
