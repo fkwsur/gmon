@@ -1,6 +1,5 @@
 const http = require("http");
 const server = http.createServer();
-const test = require("./router");
 
 let set_use = [];
 let set_router = [];
