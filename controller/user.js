@@ -1,7 +1,7 @@
 module.exports = {
   aaa: async (req) => {
     try {
-      console.log(req.query.hi)
+      console.log(req.query)
       return console.log("안녕 나야");
     } catch (error) {
       console.log(error);
