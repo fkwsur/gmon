@@ -9,6 +9,7 @@ module.exports = {
   },
   bbb: async (req) => {
     try {
+      console.log(req.body);
       return console.log("안녕 나야2");
     } catch (error) {
       console.log(error);

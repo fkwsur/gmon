@@ -9,12 +9,29 @@ let req = {};
 let req_url = {};
 let onStart = false;
 
+
 server.on("request", async (data) => {
   onStart = true;
   try {
     req = data;
     req.url = querystring.unescape(req.url);
     let data_url = req.url.split("?")
+
+    // body 변환
+    const chunks = [];
+    let req_body = "";
+    data.on("data", (chunk) => {
+      chunks.push(chunk);
+    });
+
+    // 메인 로직
+    data.on("end", () => {
+
+      //청크 변환
+      const chunks_data = Buffer.concat(chunks);
+      let body =  JSON.parse(querystring.unescape(chunks_data.toString()))
+      req.body = body
+
 
     for(const route_rows of set_router){
       if(route_rows.url == data_url[0] && route_rows.method == data.method){
@@ -27,7 +44,7 @@ server.on("request", async (data) => {
           }
           data.query = query
         }
-        return route_rows.func(data);
+        return route_rows.func(req);
       }
     }
 
@@ -40,6 +57,7 @@ server.on("request", async (data) => {
     }
 
     return "주소 안맞음";
+  });
   } catch (error) {
     console.log(error);
   }
@@ -53,8 +71,12 @@ const listen = async (port, func) => {
   }
 };
 
-const use = async (url, func) => {
-  set_use.push({ url: url, func: func });
+const use = async (params1, params2) => {
+  if(typeof(params1) == "function"){
+    console.log(params1())
+    // params1();
+  }
+  set_use.push({ url: params1, func: params2 });
 };
 let router = [];
 
