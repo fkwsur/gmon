@@ -12,14 +12,19 @@ server.on("request", async (data) => {
   onStart = true;
   try {
     req = data;
-
+    let data_url = data.url.split("?")
 
     for(const route_rows of set_router){
-      let data_url = data.url.split("?")
       if(route_rows.url == data_url[0] && route_rows.method == data.method){
-        // req.query
-        req.query = data_url[1]
-        console.log(req.query)
+        if(data.method == "GET" && data_url[1] != undefined ){
+          let query = {}
+          let obj = data_url[1].split("&");
+          for(const rows of obj){
+            let data = rows.split("=")
+            query[data[0]] = data[1]
+          }
+          data.query = query
+        }
         return route_rows.func(data);
       }
     }
@@ -55,8 +60,19 @@ const warp_routes = (router, func, method) => {
   try {
     if (onStart == false) {
       return set_router.push({url : router, func : func, method : method})
-    } else if (req.url == req_url + router) {
+    }
+    let data_url = req.url.split("?")
+    if (data_url[0] == req_url + router) {
       if (req.method != method) return;
+      if(req.method == "GET" && data_url[1] != undefined ){
+        let query = {}
+        let obj = data_url[1].split("&");
+        for(const rows of obj){
+          let data = rows.split("=")
+          query[data[0]] = data[1]
+        }
+        req.query = query
+      }
       return func(req);
     } else return;
   } catch (error) {

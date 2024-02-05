@@ -14,8 +14,6 @@ app.use("/api/v1/test", Router.testRouter)
 app.router.get("/api/v1/test", aaa)
 app.router.post("/api/v1/test2", bbb)
 
-// app.router.get("/api/v1/test2", bbb)
-
 app.listen(8081, async () => {
         console.log("server start")
 });
