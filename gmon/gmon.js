@@ -141,4 +141,4 @@ router.head = head;
 router.options = options;
 
 
-module.exports = { use, router, listen };
+module.exports = { use, router, listen ,get, post, put, drop, patch, head, options};
