@@ -14,6 +14,7 @@ const ccc = (req) => {
 }
 
 
+app.use(app.json())
 app.use("/api/v1/user", Router.userRouter)
 app.use("/api/v1/test", Router.testRouter)
 
