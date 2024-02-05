@@ -1,5 +1,6 @@
 const http = require("http");
 const server = http.createServer();
+const querystring = require('querystring');
 
 let set_use = [];
 let set_router = [];
@@ -12,7 +13,8 @@ server.on("request", async (data) => {
   onStart = true;
   try {
     req = data;
-    let data_url = data.url.split("?")
+    req.url = querystring.unescape(req.url);
+    let data_url = req.url.split("?")
 
     for(const route_rows of set_router){
       if(route_rows.url == data_url[0] && route_rows.method == data.method){
@@ -30,7 +32,7 @@ server.on("request", async (data) => {
     }
 
     for (const use_rows of set_use) {
-      if (data.url.startsWith(use_rows.url)) {
+      if (req.url.startsWith(use_rows.url)) {
         req_url = use_rows.url;
         let routes = use_rows.func;
         return routes();
