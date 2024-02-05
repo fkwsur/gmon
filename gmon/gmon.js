@@ -17,20 +17,18 @@ server.on("request", async (data) => {
     req = data;
     req.url = querystring.unescape(req.url);
     let data_url = req.url.split("?");
-
     // body 변환
     const chunks = [];
     if (data.method == "POST") {
-      // 제이슨으로 받겠다는거 해줘야지 넣을 수 있음
       data.on("data", (chunk) => {
         chunks.push(chunk);
       });
       data.on("end", () => {
         //청크 변환
         const chunks_data = Buffer.concat(chunks);
-        if(isJsonParse == false){
+        if (isJsonParse == false) {
           req.body = chunks_data.toString();
-        }else{
+        } else {
           req.body = JSON.parse(querystring.unescape(chunks_data.toString()));
         }
 
@@ -47,29 +45,29 @@ server.on("request", async (data) => {
           }
         }
       });
-      return
+      return;
     }
-      // 메인 로직
-      for (const route_rows of set_router) {
-        if (route_rows.url == data_url[0] && route_rows.method == data.method) {
-          if (data.method == "GET" && data_url[1] != undefined) {
-            let query = {};
-            let obj = data_url[1].split("&");
-            for (const rows of obj) {
-              let data = rows.split("=");
-              query[data[0]] = data[1];
-            }
-            data.query = query;
+    // 메인 로직
+    for (const route_rows of set_router) {
+      if (route_rows.url == data_url[0] && route_rows.method == data.method) {
+        if (data.method == "GET" && data_url[1] != undefined) {
+          let query = {};
+          let obj = data_url[1].split("&");
+          for (const rows of obj) {
+            let data = rows.split("=");
+            query[data[0]] = data[1];
           }
-          return route_rows.func(req);
+          data.query = query;
         }
+        return route_rows.func(req);
       }
-      for (const use_rows of set_use) {
-        if (req.url.startsWith(use_rows.url)) {
-          req_url = use_rows.url;
-          let routes = use_rows.func;
-          return routes();
-        }
+    }
+    for (const use_rows of set_use) {
+      if (req.url.startsWith(use_rows.url)) {
+        req_url = use_rows.url;
+        let routes = use_rows.func;
+        return routes();
+      }
     }
     return "주소 안맞음";
   } catch (error) {
@@ -91,7 +89,7 @@ const json = async () => {
   } catch (error) {
     console.log(error);
   }
-}
+};
 
 const use = async (params1, params2) => {
   if (typeof params1 == "function") {
@@ -196,5 +194,5 @@ module.exports = {
   patch,
   head,
   options,
-  json
+  json,
 };
