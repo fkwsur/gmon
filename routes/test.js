@@ -3,7 +3,7 @@ const { testController: controller } = require("../controller");
 
 const testRouter = () => {
         router.get("/signup", controller.aaa);
-        router.get("/signup2", controller.bbb);
+        router.post("/signup2", controller.bbb);
         router.get("/signup3", controller.ccc);
 }
 

@@ -26,8 +26,14 @@ const res_wrapper = (response) => {
       },
       send: function (result) {
         try {
-          res.writeHead(res.statusCode, { "Content-Type": "text/html" });
-          return res.end(result);
+          if(typeof(result) == "object"){
+            res.writeHead(res.statusCode, { "Content-Type": "application/JSON" });
+            res.write(JSON.stringify(result));
+          }else{
+            res.writeHead(res.statusCode, { "Content-Type": "text/html" });
+            res.write(result.toString());
+          }
+          return res.end();
         } catch (error) {
           console.log(error);
         }
@@ -36,12 +42,12 @@ const res_wrapper = (response) => {
         try {
           res.writeHead(res.statusCode, { "Content-Type": "application/JSON" });
           res.write(JSON.stringify(result));
-          return res.end();;
+          return res.end();
         } catch (error) {
           console.log(error);
         }
       },
-      res
+      res 
     };
   } catch (error) {
     console.log(error);
@@ -67,8 +73,10 @@ server.on("request", async (request, response) => {
         const chunks_data = Buffer.concat(chunks);
         if (isJsonParse == false) {
           req.body = chunks_data.toString();
-        } else {
+        } else if(typeof(chunks_data.toString()) == "object"){
           req.body = JSON.parse(querystring.unescape(chunks_data.toString()));
+        }else{
+          req.body = chunks_data.toString();
         }
 
         for (const route_rows of set_router) {

@@ -1,15 +1,15 @@
 module.exports = {
-        aaa: async (req) => {
+        aaa: async (req, res) => {
           try {
-            // console.log(req);
-            return console.log("안녕 테스트야");
+            return res.status(200).send(req.query);
           } catch (error) {
             console.log(error);
           }
         },
-        bbb: async (req) => {
+        bbb: async (req, res) => {
           try {
-            return console.log("안녕 테스트야2");
+            console.log(req.body)
+            return res.status(200).send({"ㅎㅎ" : "성공!"});
           } catch (error) {
             console.log(error);
           }
