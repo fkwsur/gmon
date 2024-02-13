@@ -1,16 +1,16 @@
 module.exports = {
-  aaa: async (req) => {
+  aaa: async (req, res) => {
     try {
       console.log(req.query)
-      return console.log("안녕 나야");
+      // return console.log("안녕 나야");
+      return res.status(200).json({"result" : "true"});
     } catch (error) {
       console.log(error);
     }
   },
-  bbb: async (req) => {
+  bbb: async (req, res) => {
     try {
-      console.log(req.body);
-      return console.log("안녕 나야2");
+      return res.status(200).json(req.body);
     } catch (error) {
       console.log(error);
     }

@@ -8,22 +8,61 @@ let set_router = [];
 let req = {};
 let req_url = {};
 let onStart = false;
-
 let isJsonParse = false;
+let res = {};
 
-server.on("request", async (data) => {
+const res_wrapper = (response) => {
+  try {
+    let res = response;
+    return {
+      status: function (status) {
+        try {
+          if (res.statusCode == status) {
+            return this;
+          } else throw "status error";
+        } catch (error) {
+          console.log(error);
+        }
+      },
+      send: function (result) {
+        try {
+          res.writeHead(res.statusCode, { "Content-Type": "text/html" });
+          return res.end(result);
+        } catch (error) {
+          console.log(error);
+        }
+      },
+      json: function (result) {
+        try {
+          res.writeHead(res.statusCode, { "Content-Type": "application/JSON" });
+          res.write(JSON.stringify(result));
+          return res.end();;
+        } catch (error) {
+          console.log(error);
+        }
+      },
+      res
+    };
+  } catch (error) {
+    console.log(error);
+  }
+}
+
+server.on("request", async (request, response) => {
   onStart = true;
   try {
-    req = data;
+    req = request;
     req.url = querystring.unescape(req.url);
     let data_url = req.url.split("?");
+    res = res_wrapper(response);
+
     // body 변환
     const chunks = [];
-    if (data.method == "POST") {
-      data.on("data", (chunk) => {
+    if (request.method == "POST") {
+      request.on("data", (chunk) => {
         chunks.push(chunk);
       });
-      data.on("end", () => {
+      request.on("end", () => {
         //청크 변환
         const chunks_data = Buffer.concat(chunks);
         if (isJsonParse == false) {
@@ -33,8 +72,11 @@ server.on("request", async (data) => {
         }
 
         for (const route_rows of set_router) {
-          if (route_rows.url == req.url && route_rows.method == data.method) {
-            return route_rows.func(req);
+          if (
+            route_rows.url == req.url &&
+            route_rows.method == request.method
+          ) {
+            return route_rows.func(req, res);
           }
         }
         for (const use_rows of set_use) {
@@ -59,7 +101,7 @@ server.on("request", async (data) => {
           }
           data.query = query;
         }
-        return route_rows.func(req);
+        return route_rows.func(req, res);
       }
     }
     for (const use_rows of set_use) {
@@ -118,7 +160,7 @@ const warp_routes = (router, func, method) => {
         }
         req.query = query;
       }
-      return func(req);
+      return func(req, res);
     } else return;
   } catch (error) {
     console.log(error);
