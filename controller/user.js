@@ -10,7 +10,9 @@ module.exports = {
   },
   bbb: async (req, res) => {
     try {
-      return res.status(200).json(req.body);
+      console.log(req.body)
+      return res.status(200).json({"잉?" : "잉잉?"});
+      // return res.status(200).json(req.body);
     } catch (error) {
       console.log(error);
     }

@@ -26,10 +26,12 @@ const res_wrapper = (response) => {
       },
       send: function (result) {
         try {
-          if(typeof(result) == "object"){
-            res.writeHead(res.statusCode, { "Content-Type": "application/JSON" });
+          if (typeof result == "object") {
+            res.writeHead(res.statusCode, {
+              "Content-Type": "application/JSON",
+            });
             res.write(JSON.stringify(result));
-          }else{
+          } else {
             res.writeHead(res.statusCode, { "Content-Type": "text/html" });
             res.write(result.toString());
           }
@@ -40,6 +42,7 @@ const res_wrapper = (response) => {
       },
       json: function (result) {
         try {
+          console.log(typeof result);
           res.writeHead(res.statusCode, { "Content-Type": "application/JSON" });
           res.write(JSON.stringify(result));
           return res.end();
@@ -47,12 +50,12 @@ const res_wrapper = (response) => {
           console.log(error);
         }
       },
-      res 
+      res,
     };
   } catch (error) {
     console.log(error);
   }
-}
+};
 
 server.on("request", async (request, response) => {
   onStart = true;
@@ -71,13 +74,32 @@ server.on("request", async (request, response) => {
       request.on("end", () => {
         //청크 변환
         const chunks_data = Buffer.concat(chunks);
-        if (isJsonParse == false) {
-          req.body = chunks_data.toString();
-        } else if(typeof(chunks_data.toString()) == "object"){
-          req.body = JSON.parse(querystring.unescape(chunks_data.toString()));
+        if (
+          request.headers.hasOwnProperty("content-type") &&
+          request.headers["content-type"].indexOf("boundary=") > -1
+        ) {
+          let parts = request.headers["content-type"].split("boundary=");
+          let boundary = parts[1];
+          let splitBody = chunks_data.toString().split(boundary)
+          splitBody.shift()
+          splitBody.pop()
+          splitBody = splitBody.map(function(k) {
+            return k.replace('\r\nContent-Disposition: form-data; name=', '"')
+             .replace('\r\n\r\n', ':"')
+             .replace("\"", '"')
+             .replace("\"", '')
+             .replace('\r\n--', '"');
+          });
+          let data = "{" + splitBody.join() + "}"
+          req.body = JSON.parse(data);
         }else{
-          req.body = chunks_data.toString();
+          if (isJsonParse == false) {
+            req.body = chunks_data.toString();
+          } else {
+            req.body = JSON.parse(querystring.unescape(chunks_data.toString()));
+          }
         }
+
 
         for (const route_rows of set_router) {
           if (
