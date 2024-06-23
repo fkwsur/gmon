@@ -81,16 +81,23 @@ server.on("request", async (request, response) => {
           let parts = request.headers["content-type"].split("boundary=");
           let boundary = parts[1];
           let splitBody = chunks_data.toString().split(boundary)
+          console.log(splitBody)
           splitBody.shift()
           splitBody.pop()
           splitBody = splitBody.map(function(k) {
             return k.replace('\r\nContent-Disposition: form-data; name=', '"')
              .replace('\r\n\r\n', ':"')
+             .replace('; filename', ': [filename')
              .replace("\"", '"')
              .replace("\"", '')
              .replace('\r\n--', '"');
           });
-          let data = "{" + splitBody.join() + "}"
+          let data;
+          if(splitBody.includes("filename") == true){
+             data = "{" + splitBody.join() + "]}"
+          }else{
+             data = "{" + splitBody.join() + "}"
+          }
           req.body = JSON.parse(data);
         }else{
           if (isJsonParse == false) {

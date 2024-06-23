@@ -1,5 +1,6 @@
 1. 폼데이터 타입 만들기 : SyntaxError: Unexpected number in JSON at position 1
 => 진행중
+=> 파일 핸들링 하면됨
 2. 에러에 대한 핸들링
 3. 미들웨어
 4. 문서 작성
